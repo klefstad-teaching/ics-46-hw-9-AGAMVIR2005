@@ -54,10 +54,11 @@ void load_words(set<string>& word_list, const string& file_name) {
 
 void print_word_ladder(const vector<string>& ladder) {
     for (const auto& word : ladder) {
-        cout << word << (word == ladder.back() ? "\n" : " -> ");
+        cout << word << " ";
     }
+    cout<<endl;
 }
 
 void verify_word_ladder() {
-    // Implement verification logic if needed
+    return;
 }
