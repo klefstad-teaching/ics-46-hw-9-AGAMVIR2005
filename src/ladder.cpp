@@ -15,8 +15,8 @@ bool edit_distance_within(const std::string& str1, const std::string& str2, int 
     int i = 0, j = 0, edits = 0;
     while (i < len1 && j < len2) {
         if (str1[i] != str2[j]) {
-
-            if (++edits > d) return false;
+            edits++;
+            if (edits> d) return false;
 
 
             if (len1 > len2) {
@@ -35,7 +35,9 @@ bool edit_distance_within(const std::string& str1, const std::string& str2, int 
         }
     }
 
-    edits += abs(len1 - i) + abs(len2 - j);
+    if(i<len1 || j<len2){
+        edits++;
+    }
 
     return edits <= d;
 }
@@ -45,29 +47,33 @@ bool is_adjacent(const string& word1, const string& word2) {
 }
 
 vector<string> generate_word_ladder(const string& begin_word, const string& end_word, const set<string>& word_list) {
-    if (begin_word == end_word) return {};
     queue<vector<string>> ladders;
-    ladders.push({begin_word});
-    set<string> visited = {begin_word};
-    
+    vector<string> word;
+    if (begin_word == end_word) {
+        return word;
+    }
+    word.push_back(begin_word);
+    ladders.push(word);
+    set<string> visited;
+    visited.insert(begin_word);
     while (!ladders.empty()) {
-        auto ladder = ladders.front();
+        vector<string> lastladder = ladders.front();
         ladders.pop();
-        string last_word = ladder.back();
-        if (last_word == end_word) return ladder;
-        for (const auto& word : word_list) {
-            if (!visited.count(word)&& is_adjacent(last_word, word)) {
+        string last_word = lastladder.back();
+        for (string word: word_list) {
+            if (is_adjacent(word, last_word) && !visited.count(word)) {
                 visited.insert(word);
-                auto new_ladder = ladder;
-                new_ladder.push_back(word);
-                ladders.push(new_ladder);
-                if (word == last_word){
-                    return new_ladder;
+                vector<string> newladder = lastladder;
+                newladder.push_back(word);
+                ladders.push(newladder);
+                if (word == end_word) {
+                    return newladder;
                 }
             }
         }
     }
     return {};
+
 }
 
 void load_words(set<string>& word_list, const string& file_name) {
