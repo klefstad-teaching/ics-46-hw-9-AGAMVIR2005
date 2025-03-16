@@ -5,13 +5,36 @@ void error(string word1, string word2, string msg) {
 }
 
 bool edit_distance_within(const std::string& str1, const std::string& str2, int d) {
-    if (abs(int(str1.size()) - int(str2.size())) > d) return false;
-    int edits = 0;
-    for (size_t i = 0; i < min(str1.size(), str2.size()); ++i) {
-        if (str1[i] != str2[i]) {
+    int len1 = str1.size();
+    int len2 = str2.size();
+    if (abs(len1 - len2) > d) return false;
+
+    int i = 0, j = 0, edits = 0;
+    while (i < len1 && j < len2) {
+        if (str1[i] != str2[j]) {
+            // Increment edit count when mismatch found
             if (++edits > d) return false;
+
+            // Handle insertion/deletion: move the pointer of the longer string
+            if (len1 > len2) {
+                ++i;
+            } else if (len2 > len1) {
+                ++j;
+            } else {
+                // Handle replacement: move both pointers
+                ++i;
+                ++j;
+            }
+        } else {
+            // Move both pointers if characters match
+            ++i;
+            ++j;
         }
     }
+
+    // Count any remaining characters as edits
+    edits += abs(len1 - i) + abs(len2 - j);
+
     return edits <= d;
 }
 
