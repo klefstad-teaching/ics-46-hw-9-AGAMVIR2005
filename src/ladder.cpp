@@ -15,27 +15,26 @@ bool edit_distance_within(const std::string& str1, const std::string& str2, int 
     int i = 0, j = 0, edits = 0;
     while (i < len1 && j < len2) {
         if (str1[i] != str2[j]) {
-            // Increment edit count when mismatch found
+
             if (++edits > d) return false;
 
-            // Handle insertion/deletion: move the pointer of the longer string
+
             if (len1 > len2) {
                 ++i;
             } else if (len2 > len1) {
                 ++j;
             } else {
-                // Handle replacement: move both pointers
+
                 ++i;
                 ++j;
             }
         } else {
-            // Move both pointers if characters match
+
             ++i;
             ++j;
         }
     }
 
-    // Count any remaining characters as edits
     edits += abs(len1 - i) + abs(len2 - j);
 
     return edits <= d;
@@ -46,9 +45,9 @@ bool is_adjacent(const string& word1, const string& word2) {
 }
 
 vector<string> generate_word_ladder(const string& begin_word, const string& end_word, const set<string>& word_list) {
+    if (begin_word == end_word) return {};
     queue<vector<string>> ladders;
     ladders.push({begin_word});
-    if (begin_word == end_word) return {};
     set<string> visited = {begin_word};
     
     while (!ladders.empty()) {
@@ -57,11 +56,14 @@ vector<string> generate_word_ladder(const string& begin_word, const string& end_
         string last_word = ladder.back();
         if (last_word == end_word) return ladder;
         for (const auto& word : word_list) {
-            if (visited.find(word) == visited.end() && is_adjacent(last_word, word)) {
+            if (!visited.count(word)&& is_adjacent(last_word, word)) {
+                visited.insert(word);
                 auto new_ladder = ladder;
                 new_ladder.push_back(word);
                 ladders.push(new_ladder);
-                visited.insert(word);
+                if (word == last_word){
+                    return new_ladder;
+                }
             }
         }
     }
@@ -71,13 +73,13 @@ vector<string> generate_word_ladder(const string& begin_word, const string& end_
 void load_words(set<string>& word_list, const string& file_name) {
     ifstream file(file_name);
     if (!file) {
-        cerr << "Cannot open file: " << file_name << endl;
         return;
     }
     string word;
     while (file >> word) {
         word_list.insert(word);
     }
+    file.close();
 }
 
 void print_word_ladder(const vector<string>& ladder) {
@@ -97,7 +99,7 @@ void verify_word_ladder() {
 
     set<string> word_list;
 
-    load_words(word_list, "words.txt");
+    load_words(word_list, "src/words.txt");
 
     my_assert(generate_word_ladder("cat", "dog", word_list).size() == 4);
 
